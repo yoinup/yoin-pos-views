@@ -1,0 +1,21 @@
+[submodule "app/submodules/yoin-views-ipad"]
+	path = app/submodules/yoin-views-ipad
+	url = git@github.com:ppcano/yoin-views-ipad.git
+[submodule "app/submodules/yoin-views"]
+	path = app/submodules/yoin-views
+	url = git@github.com:ppcano/yoin-views.git
+[submodule "app/submodules/yoin-ember"]
+	path = app/submodules/yoin-ember
+	url = git@github.com:ppcano/yoin-ember.git
+[submodule "app/submodules/ember-data-tastypie-adapter"]
+	path = app/submodules/ember-data-tastypie-adapter
+	url = git@github.com:escalant3/ember-data-tastypie-adapter.git
+[submodule "app/submodules/ember.js"]
+	path = app/submodules/ember.js
+	url = git://github.com/emberjs/ember.js.git
+[submodule "app/submodules/data"]
+	path = app/submodules/data
+	url = git://github.com/emberjs/data.git
+[submodule "app/submodules/sproutcore-touch"]
+	path = app/submodules/sproutcore-touch
+	url = git@github.com:emberjs-addons/sproutcore-touch.git

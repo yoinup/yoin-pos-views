@@ -1,0 +1,32 @@
+@font-face {
+  font-family: 'Yoin Icons';
+  src: url('assets/fonts/icons2.ttf');
+}
+.icon:before,
+.icon-after:after {
+  font-size: 24px;
+  font-family: 'Yoin Icons';
+  content: attr(icon);
+  -webkit-font-smoothing: antialiased;
+  /*line-height: 1;*/
+
+  text-decoration: none;
+}
+.icon.is-icon-x-big:before,
+.icon-after.is-icon-x-big:after {
+  font-size: 55.5px;
+}
+.icon.is-icon-big:before,
+.icon-after.is-icon-big:after {
+  font-size: 33.75px;
+}
+.icon.is-icon-small:before,
+.icon-after.is-icon-small:after {
+  font-size: 18.75px;
+  font-size: 13px;
+}
+.icon.is-icon-x-small:before,
+.icon-after.is-icon-x-small:after {
+  font-size: 15.75px;
+  font-size: 11px;
+}

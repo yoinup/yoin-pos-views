@@ -1,0 +1,36 @@
+/***NEW COLORS***/
+/***OLD COLORS***/
+/*@orange00: #ff6d4a;
+@orange01: #ff4e24;
+@orange02: #e64620;*/
+/*@grey00: #FFF8F7;
+@grey01: #F2EBEA;
+@grey02: #dcdcdc;
+@grey03: #9C9190;
+@grey04: #665F5E;
+@grey05: #575150;*/
+/*@blue_00:#97abcf;
+@blue_01:#6e8ebe;
+@blue_02:#3f6eaa;
+@blue_03:#2c4d77;*/
+/***NEW COLORS***/
+/***OLD COLORS***/
+/*@orange00: #ff6d4a;
+@orange01: #ff4e24;
+@orange02: #e64620;*/
+/*@grey00: #FFF8F7;
+@grey01: #F2EBEA;
+@grey02: #dcdcdc;
+@grey03: #9C9190;
+@grey04: #665F5E;
+@grey05: #575150;*/
+/*@blue_00:#97abcf;
+@blue_01:#6e8ebe;
+@blue_02:#3f6eaa;
+@blue_03:#2c4d77;*/
+@media only screen and (max-device-width: 320px), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+  .item_round_button > div > .icon {
+    line-height: 44.1px;
+    text-indent: 2.1px;
+  }
+}

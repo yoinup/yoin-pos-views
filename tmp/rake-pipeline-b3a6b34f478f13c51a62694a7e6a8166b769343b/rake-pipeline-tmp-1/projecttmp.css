@@ -1,0 +1,10 @@
+#app {
+  width: 768px;
+  height: 1024px;
+}
+.screen {
+  width: 768px;
+}
+body {
+  overflow: hidden;
+}

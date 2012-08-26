@@ -1,0 +1,57 @@
+/***NEW COLORS***/
+/***OLD COLORS***/
+/*@orange00: #ff6d4a;
+@orange01: #ff4e24;
+@orange02: #e64620;*/
+/*@grey00: #FFF8F7;
+@grey01: #F2EBEA;
+@grey02: #dcdcdc;
+@grey03: #9C9190;
+@grey04: #665F5E;
+@grey05: #575150;*/
+/*@blue_00:#97abcf;
+@blue_01:#6e8ebe;
+@blue_02:#3f6eaa;
+@blue_03:#2c4d77;*/
+.box {
+  background-color: #f2f2f2;
+  background-image: url(assets/images/BG_25.png);
+  color: #a0a0a0;
+  border-radius: 10px;
+  margin: 0 3%;
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  -webkit-box-shadow: 0 0 0 1px #959595, 0 4px 4px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 1px #959595, 0 1px 4px 0 rgba(0, 0, 0, 0.3);
+}
+.box > .box-title {
+  background-color: #e5e5e5;
+  color: #707070;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+.box > .box-title-top {
+  border-top-left-radius: 0.8em;
+  border-top-right-radius: 0.8em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  -webkit-box-shadow: inset 0 -1px 0 0 #959595;
+}
+.box > .box-title-bottom {
+  border-bottom-left-radius: 0.8em;
+  border-bottom-right-radius: 0.8em;
+  border-top: 1px solid #959595;
+  -webkit-box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+}
+.box > .box-content {
+  padding-left: 9px;
+  padding-right: 9px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+.box > .box-content.is-text {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

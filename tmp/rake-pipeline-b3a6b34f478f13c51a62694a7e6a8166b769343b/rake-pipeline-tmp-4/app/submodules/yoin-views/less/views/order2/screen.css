@@ -1,0 +1,40 @@
+/***NEW COLORS***/
+/***OLD COLORS***/
+/*@orange00: #ff6d4a;
+@orange01: #ff4e24;
+@orange02: #e64620;*/
+/*@grey00: #FFF8F7;
+@grey01: #F2EBEA;
+@grey02: #dcdcdc;
+@grey03: #9C9190;
+@grey04: #665F5E;
+@grey05: #575150;*/
+/*@blue_00:#97abcf;
+@blue_01:#6e8ebe;
+@blue_02:#3f6eaa;
+@blue_03:#2c4d77;*/
+.screen {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-repeat: repeat;
+  background: url(assets/images/main_bg.png), -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(87%, #e5e5e5), color-stop(99%, #eeeeee));
+  background: url(assets/images/main_bg.png), -webkit-linear-gradient(top, #eeeeee 0%, #e5e5e5 87%, #eeeeee 99%);
+}
+.screen > .screen-container {
+  position: relative;
+  width: 100%;
+  /*min-height: dinamically*/
+
+  background-color: #dcdcdc;
+  background-image: url(assets/images/BG.png), -webkit-linear-gradient(0, transparent 40%, rgba(255, 255, 255, 0.3) 40%);
+  background-size: 9%;
+}
+.screen > .screen-container.is-header-action {
+  /*min-height: dinamically*/
+
+}

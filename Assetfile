@@ -1,0 +1,282 @@
+require "rake-pipeline-web-filters"
+require 'rake-pipeline-web-filters/filter_with_dependencies'
+require "json"
+require "less"
+require "execjs"
+require "uglifier"
+
+
+
+class CustomLessFilter < Rake::Pipeline::Filter
+	include Rake::Pipeline::Web::Filters::FilterWithDependencies
+
+	attr_reader :options
+
+	def initialize(options={}, context = nil, &block)
+		block ||= proc { |input| input.sub(/\.less$/, '.css') }
+		super(&block)
+		@options = options
+	end
+
+	def generate_output(inputs, output)
+
+		parser = Less::Parser.new :paths => ['./app/submodules/yoin-views-ipad/less/import', 
+																				 './app/submodules/yoin-views/less/import', 
+																				 './app/submodules/yoin-views/less/import2']
+		inputs.each do |input|
+      name = File.basename(input.path, '.less')
+			output.write parser.parse(input.read).to_css
+		end
+	end
+
+	def external_dependencies
+		[ 'less' ]
+	end
+end
+
+
+class PrecompiledHandlebarsFilter < Rake::Pipeline::Filter
+
+  def js_context
+    # We're using Ember to build Ember! Inception!
+    unless @context
+      headless = File.read("lib/headless-ember.js")
+      ember = File.read("lib/ember.js")
+      @context = ExecJS.compile([headless, ember].join("\n"))
+    end
+    @context
+  end
+
+  def initialize(&block)
+    block ||= proc { |input| input.sub(/\.handlebars$/, '.js') }
+    super(&block)
+		@counter = 0
+    @precompiled = true
+  end
+
+
+  def generate_output(inputs, output)
+
+		if ( @counter == 0 ) 
+
+			output.write "(function(){ 
+        ENV = {
+          VIEW_PRESERVES_CONTEXT:true,
+          CP_DEFAULT_CACHEABLE:true
+        };
+      })();\n"
+			output.write "minispade.require(\"ember-debug\");\n"
+			output.write "minispade.require(\"ember-metal\");\n"
+			output.write "minispade.require(\"ember-runtime\");\n"
+			output.write "minispade.require(\"ember-application\");\n"
+			output.write "minispade.require(\"ember-views\");\n"
+			output.write "minispade.require(\"ember-states\");\n"
+			output.write "minispade.require(\"metamorph\");\n"
+			output.write "minispade.require(\"ember-handlebars\");\n"
+		end
+		@counter += 1
+
+    inputs.each do |input|
+
+      name = File.basename(input.path, '.handlebars')
+      if ( @precompiled )
+        compiled = js_context.call("precompileEmberHandlebars", input.read)
+        output.write "\nEmber.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{compiled});\n"
+
+      else
+
+        output.write "Ember.TEMPLATES['#{name}'] =  Ember.Handlebars.compile(#{input.read.to_json});\n"
+
+      end
+
+
+    end
+  end
+end
+
+
+class EmberProductionFilter < Rake::Pipeline::Filter
+  def generate_output(inputs, output)
+    inputs.each do |input|
+      result = File.read(input.fullpath)
+      result.gsub!(%r{^(\s)+ember_(assert|deprecate|warn)\((.*)\).*$}, "")
+      output.write result
+    end
+  end
+end
+
+# you must restart the server?
+files = Dir.glob('app/submodules/yoin-views/assets/*')
+FileUtils.mkdir 'source/assets' unless Dir.exists? 'source/assets'
+FileUtils.cp_r files, 'source/assets'
+
+
+files2 = Dir.glob('app/submodules/yoin-views-ipad/assets2/*')
+FileUtils.mkdir 'source/assets2' unless Dir.exists? 'source/assets2'
+FileUtils.cp_r files2, 'source/assets2'
+puts 'moved images to the correct folder'
+
+
+output "source"
+
+
+input "."  do
+
+
+	match "app/submodules/yoin-views-ipad/less/views/**/*.less" do
+		filter CustomLessFilter 
+		filter ConcatFilter, "projecttmp.css"
+	end
+
+	match "app/submodules/yoin-views/less/views/**/*.less" do
+		filter CustomLessFilter 
+		filter ConcatFilter, "projecttmp.css"
+	end
+
+  media_query = "mobile"
+
+	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
+		filter CustomLessFilter 
+		filter ConcatFilter, "projecttmp.css"
+	end
+
+	match "app/submodules/yoin-views/reset/normalize.css" do
+		filter ConcatFilter, "projecttmp.css"
+	end
+
+end
+
+# TODO: ideally in the same file
+input "app"  do
+
+
+	match "submodules/yoin-views-ipad/templates/**/*.handlebars" do
+		filter PrecompiledHandlebarsFilter
+		filter ConcatFilter, "apptmp.js"
+	end
+
+
+
+	match "submodules/yoin-views/templates/**/*.handlebars" do
+		filter PrecompiledHandlebarsFilter
+		filter ConcatFilter, "apptmp.js"
+	end
+
+
+
+	match "app/lib/**/*.js" do
+		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
+			id = input.path.dup
+			id.sub!('/lib/', '/')
+			id.sub!(/\.js$/, '')
+			id.sub!(/\/main$/, '')
+			id
+		}
+
+		concat "apptmp.js"
+	end
+
+
+
+
+	match "submodules/{ember-data-tastypie-adapter,yoin-ember,yoin-views,yoin-views-ipad}/lib/**/*.js" do
+		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
+			id = input.path.dup
+			id.sub!('submodules/', '')
+			id.sub!('/lib/', '/')
+			id.sub!(/\.js$/, '')
+			id.sub!(/\/main$/, '')
+			id
+		}
+
+	 concat "apptmp.js"
+	end
+
+
+	match "submodules/*/packages/{ember-data,ember-application,ember-debug,ember-metal,ember-runtime,ember-states,ember-views,metamorph,ember-handlebars,ember-touch}/lib/**/.js" do
+		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
+			id = input.path.dup
+			id.sub!('submodules/', '')
+			id.sub!(/[a-z\-\.]+\//, '')
+			id.sub!('packages/', '')
+			id.sub!('/lib/', '/')
+			id.sub!(/\.js$/, '')
+			id.sub!(/\/main$/, '')
+			id
+		}
+
+	 concat "apptmp.js"
+	end
+
+
+
+
+
+	match "vendor/minispade.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/qrcode.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/moment.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/iscroll.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/infobubble.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/jquery.ui.map.min.js.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/jquery.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	match "vendor/handlebars-1.0.0.beta.6.js" do
+	#match "vendor/handlebars.runtime-1.0.0.beta.6.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+	#match "vendor/facebook_js_sdk.js" do
+	#	filter ConcatFilter, "apptmp.js"
+	#end
+
+	match "vendor/i18n.js" do
+		filter ConcatFilter, "apptmp.js"
+	end
+
+end
+
+## check YOIN_PROD to minify output to production development
+input "source"  do
+
+	match "apptmp.js" do
+
+    if ( !ENV['YOIN_PROD'].nil? && !ENV['YOIN_PROD'].empty? )
+      filter EmberProductionFilter
+      uglify( {:copyright => false} )
+    end
+
+		filter ConcatFilter, "app.js"
+
+	end
+
+	match "projecttmp.css" do
+
+    if ( !ENV['YOIN_PROD'].nil? && !ENV['YOIN_PROD'].empty? )
+      yui_css 
+    end
+		filter ConcatFilter, "project.css"
+
+	end
+
+end
+# vim: filetype=ruby
