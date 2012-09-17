@@ -12,6 +12,7 @@ require('yoin-ember/local_store');
 require('yoin-ember/data');
 
 Yn.embedded = false;
+require('yoin-ember/utils');
 require('yoin-ember/models');
 require('yoin-ember/fixtures/initial');
 
