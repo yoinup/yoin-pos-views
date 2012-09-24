@@ -133,7 +133,7 @@ input "."  do
 		filter ConcatFilter, "projecttmp.css"
 	end
 
-  media_query = "mobile"
+  media_query = "tablet"
 
 	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
 		filter CustomLessFilter 
