@@ -110,6 +110,9 @@ files = Dir.glob('app/submodules/yoin-views/assets/*')
 FileUtils.mkdir 'source/assets' unless Dir.exists? 'source/assets'
 FileUtils.cp_r files, 'source/assets'
 
+files = Dir.glob('app/submodules/yoin-views/assets_fx/*')
+FileUtils.mkdir 'source/assets_fx' unless Dir.exists? 'source/assets_fx'
+FileUtils.cp_r files, 'source/assets_fx'
 
 files2 = Dir.glob('app/submodules/yoin-views-ipad/assets2/*')
 FileUtils.mkdir 'source/assets2' unless Dir.exists? 'source/assets2'
