@@ -9,7 +9,7 @@ App = Me.Application.create({
     venueUser.addObserver('isLoaded', function(item) {
 
       self.view = Yvi.LoginScreenView.create({
-        venueUser: venueUser
+        venueUser: null
       });
 
       self.view.appendTo('#app');
