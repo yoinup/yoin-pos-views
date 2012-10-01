@@ -4,25 +4,25 @@ App = Me.Application.create({
 	run: function() {
 
 		var self = this,
-				venueUser = this.store.find(Yn.User, 17),
 				user = this.store.find(Yn.User, 16),
 				venue = this.store.find(Yn.Venue, 236),
-				invitations = this.store.find(Yn.Invitation, 1)
-				products = this.store.find(Yn.Product, {'limit': 2});
+				invitations = this.store.find(Yn.Invitation, {'limit': 2}),
+				selectedInvitation;
 
-    invitations.addObserver('isLoaded', function(item) {
+		invitations.addObserver('isLoaded', function() {
 
-      self.view = Yvi.ConfirmScreenView.create({
-        venueUser: venueUser,
-        user: user,
-        venue: venue,
-        invitations: invitations,
-        products: products
-      });
+			selectedInvitation = invitations.get('firstObject');
 
-      self.view.appendTo('#app');
+			self.view = Yvi.ConfirmScreenView.create({
+				user: user,
+				venue: venue,
+				invitations: invitations,
+				selected: selectedInvitation
+			});
 
-    });
+			self.view.appendTo('#app');
+
+		});
 
 	}
 
