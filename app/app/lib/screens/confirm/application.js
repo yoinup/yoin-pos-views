@@ -6,7 +6,7 @@ App = Me.Application.create({
 		var self = this,
 				user = this.store.find(Yn.User, 16),
 				venue = this.store.find(Yn.Venue, 236),
-				invitations = this.store.find(Yn.Invitation, {'id': '4'}),
+				invitations = this.store.find(Yn.Invitation, {'limit': 2}),
 				selectedInvitation;
 
 		invitations.addObserver('isLoaded', function() {
