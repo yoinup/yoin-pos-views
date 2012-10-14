@@ -13,7 +13,7 @@ Me.Application = Yn.Application.extend({
   _initStore: function() {
 
 		this.store = DS.Store.create({
-			revision: 4,
+			revision: 6,
 			adapter: Yn.FixtureAdapter.create({
 				simulateRemoteResponse: this.settings.simulateRemoteResponse,
 				latency: this.settings.simulateRemoteResponseLatency

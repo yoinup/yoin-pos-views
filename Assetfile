@@ -40,8 +40,10 @@ class PrecompiledHandlebarsFilter < Rake::Pipeline::Filter
   def js_context
     # We're using Ember to build Ember! Inception!
     unless @context
-      headless = File.read("lib/headless-ember.js")
-      ember = File.read("lib/ember.js")
+      #headless = File.read("lib/headless-ember.js")
+      #ember = File.read("lib/ember.js")
+      headless = File.read("app/submodules/ember.js/lib/headless-ember.js")
+      ember = File.read("app/submodules/ember.js/lib/ember.js")
       @context = ExecJS.compile([headless, ember].join("\n"))
     end
     @context
@@ -71,6 +73,7 @@ class PrecompiledHandlebarsFilter < Rake::Pipeline::Filter
 			output.write "minispade.require(\"ember-application\");\n"
 			output.write "minispade.require(\"ember-views\");\n"
 			output.write "minispade.require(\"ember-states\");\n"
+			output.write "minispade.require(\"ember-routing\");\n"
 			output.write "minispade.require(\"metamorph\");\n"
 			output.write "minispade.require(\"ember-handlebars\");\n"
 		end
@@ -196,7 +199,7 @@ input "app"  do
 	end
 
 
-	match "submodules/*/packages/{ember-data,ember-application,ember-debug,ember-metal,ember-runtime,ember-states,ember-views,metamorph,ember-handlebars,ember-touch}/lib/**/.js" do
+	match "submodules/*/packages/{ember-data,ember-application,ember-debug,ember-metal,ember-runtime,ember-states,ember-routing,ember-views,metamorph,ember-handlebars,ember-touch}/lib/**/.js" do
 		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
 			id = input.path.dup
 			id.sub!('submodules/', '')
