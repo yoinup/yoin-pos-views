@@ -14,5 +14,10 @@ pull:
 	cd app/submodules/yoin-views-ipad; git checkout master; git pull origin master;git checkout master; cd ../../..;\
 
 
+submodule:
 
-.PHONY: log less pull
+	cd app/submodules/ember.js; git checkout yoinup; git pull origin yoinup; cd ../../..;\
+	cd app/submodules/data; git checkout yoinup; git pull origin yoinup; cd ../../..;\
+
+
+.PHONY: log less pull submodule

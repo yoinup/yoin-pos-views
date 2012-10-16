@@ -13,3 +13,9 @@
 [submodule "app/submodules/sproutcore-touch"]
 	path = app/submodules/sproutcore-touch
 	url = git@github.com:emberjs-addons/sproutcore-touch.git
+[submodule "app/submodules/data"]
+	path = app/submodules/data
+	url = git@github.com:yoinup/data.git
+[submodule "app/submodules/ember.js"]
+	path = app/submodules/ember.js
+	url = git@github.com:yoinup/ember.js.git
