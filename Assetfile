@@ -7,31 +7,15 @@ require "uglifier"
 
 
 
-class CustomLessFilter < Rake::Pipeline::Filter
-	include Rake::Pipeline::Web::Filters::FilterWithDependencies
-
-	attr_reader :options
+class CustomLessFilter < Rake::Pipeline::Web::Filters::LessFilter
 
 	def initialize(options={}, context = nil, &block)
-		block ||= proc { |input| input.sub(/\.less$/, '.css') }
-		super(&block)
-		@options = options
+		super(options, context, &block)
+		@options = { :paths => ['./app/submodules/yoin-views-ipad/less/import', 
+                            './app/submodules/yoin-views/less/import', 
+                            './app/submodules/yoin-views/less/import2'] }
 	end
 
-	def generate_output(inputs, output)
-
-		parser = Less::Parser.new :paths => ['./app/submodules/yoin-views-ipad/less/import', 
-																				 './app/submodules/yoin-views/less/import', 
-																				 './app/submodules/yoin-views/less/import2']
-		inputs.each do |input|
-      name = File.basename(input.path, '.less')
-			output.write parser.parse(input.read).to_css
-		end
-	end
-
-	def external_dependencies
-		[ 'less' ]
-	end
 end
 
 
