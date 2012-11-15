@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/livingsocial/rake-pipeline.git
-  revision: 3465e0e3e134bf52ddf5d138e8c8262412080095
+  revision: 543f4322fe70facee9572d29ddabf7f090dad68a
+  ref: 543f4322fe70facee9572d29ddabf7f090dad68a
   specs:
     rake-pipeline (0.6.0)
       rake (~> 0.9.0)
@@ -8,7 +9,8 @@ GIT
 
 GIT
   remote: https://github.com/wycats/rake-pipeline-web-filters.git
-  revision: 51915f60889fbf54fc2e81b86b594bf4c7be4ea5
+  revision: 81a22fb0808dfdeab8ed92d5d8c898ad198b9938
+  ref: 81a22fb0808dfdeab8ed92d5d8c898ad198b9938
   specs:
     rake-pipeline-web-filters (0.6.0)
       rack
