@@ -8,5 +8,5 @@ require 'rake-pipeline/middleware'
 #  rewrite '/', '/index.html'
 #end
 
-use Rake::Pipeline::Middleware, "Assetfile"
+use Rake::Pipeline::Middleware, Rake::Pipeline::Project.new("Assetfile")
 run Rack::Directory.new('.')
