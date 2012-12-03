@@ -16,6 +16,3 @@
 [submodule "app/submodules/data"]
 	path = app/submodules/data
 	url = git://github.com/emberjs/data.git
-[submodule "app/submodules/sproutcore-touch"]
-	path = app/submodules/sproutcore-touch
-	url = git@github.com:emberjs-addons/sproutcore-touch.git
