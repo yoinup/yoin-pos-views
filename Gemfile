@@ -3,7 +3,7 @@
 source "http://rubygems.org"
 
 #gem "rake"
-gem 'therubyracer', :platform => :ruby
+gem 'therubyracer', '~> 0.11.2'
 gem "uglifier", "~> 1.2.3"
 gem "execjs", "~> 1.2.6"
 
@@ -15,7 +15,7 @@ gem "jshintrb"
 
 gem "yui-compressor"
 
-gem "less"
+gem "less", "~> 2.2.2"
 
 gem "rack"
 gem "rake-pipeline", :git => "https://github.com/livingsocial/rake-pipeline.git"

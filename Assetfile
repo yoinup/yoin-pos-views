@@ -6,6 +6,32 @@ require "execjs"
 require "uglifier"
 
 
+class AddMicroLoader < Rake::Pipeline::Filter
+  LOADER = File.expand_path("../app/submodules/ember.js/packages/loader/lib/main.js", __FILE__)
+
+  def initialize(options={}, &block)
+    super(&block)
+    @global = options[:global]
+  end
+
+  def generate_output(inputs, output)
+    output.write "(function() {\n" unless @global
+
+    output.write File.read(LOADER)
+
+    inputs.each do |input|
+      output.write input.read
+    end
+
+    output.write "\n})();\n" unless @global
+  end
+
+  def additional_dependencies(input)
+    [ LOADER ]
+  end
+end
+
+
 
 class CustomLessFilter < Rake::Pipeline::Web::Filters::LessFilter
 
@@ -49,6 +75,8 @@ class PrecompiledHandlebarsFilter < Rake::Pipeline::Filter
           CP_DEFAULT_CACHEABLE:true
         };
       })();\n"
+			output.write "minispade.require(\"rsvp\");\n"
+			output.write "minispade.require(\"container\");\n"
 			output.write "minispade.require(\"ember-debug\");\n"
 			output.write "minispade.require(\"ember-metal\");\n"
 			output.write "minispade.require(\"ember-runtime\");\n"
@@ -57,6 +85,7 @@ class PrecompiledHandlebarsFilter < Rake::Pipeline::Filter
 			output.write "minispade.require(\"ember-states\");\n"
 			output.write "minispade.require(\"metamorph\");\n"
 			output.write "minispade.require(\"ember-handlebars\");\n"
+			output.write "minispade.require(\"ember-handlebars-compiler\");\n"
 		end
 		@counter += 1
 
@@ -140,6 +169,7 @@ input "app"  do
 	match "submodules/yoin-views-ipad/templates/**/*.handlebars" do
 		filter PrecompiledHandlebarsFilter
 		filter ConcatFilter, "apptmp.js"
+    filter AddMicroLoader, :global => true
 	end
 
 
@@ -147,6 +177,7 @@ input "app"  do
 	match "submodules/yoin-views/templates/**/*.handlebars" do
 		filter PrecompiledHandlebarsFilter
 		filter ConcatFilter, "apptmp.js"
+    filter AddMicroLoader, :global => true
 	end
 
 
@@ -161,12 +192,24 @@ input "app"  do
 		}
 
 		concat "apptmp.js"
+    filter AddMicroLoader, :global => true
 	end
 
 
+	match "submodules/{yoin-ember}/fixtures/**/*.js" do
+		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
+			id = input.path.dup
+			id.sub!('submodules/', '')
+			id.sub!(/\.js$/, '')
+			id
+		}
+
+	 concat "apptmp.js"
+   filter AddMicroLoader, :global => true
+	end
 
 
-	match "submodules/{ember-data-tastypie-adapter,yoin-ember,yoin-views,yoin-views-ipad}/lib/**/*.js" do
+	match "submodules/{yoin-ember,yoin-views,yoin-views-ipad}/lib/**/*.js" do
 		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
 			id = input.path.dup
 			id.sub!('submodules/', '')
@@ -177,10 +220,11 @@ input "app"  do
 		}
 
 	 concat "apptmp.js"
+    filter AddMicroLoader, :global => true
 	end
 
 
-	match "submodules/*/packages/{ember-data,ember-application,ember-debug,ember-metal,ember-runtime,ember-states,ember-views,metamorph,ember-handlebars,ember-touch}/lib/**/.js" do
+	match "submodules/*/packages/{ember-data,ember-application,ember-routing,ember-debug,ember-metal,ember-runtime,ember-states,ember-views,rsvp,container,metamorph,ember-handlebars,ember-handlebars-compiler,ember-touch}/lib/**/.js" do
 		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
 			id = input.path.dup
 			id.sub!('submodules/', '')
@@ -193,6 +237,7 @@ input "app"  do
 		}
 
 	 concat "apptmp.js"
+    filter AddMicroLoader, :global => true
 	end
 
 
@@ -211,10 +256,6 @@ input "app"  do
 		filter ConcatFilter, "apptmp.js"
 	end
 
-	match "vendor/iscroll.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
 	match "vendor/infobubble.js" do
 		filter ConcatFilter, "apptmp.js"
 	end
@@ -223,11 +264,11 @@ input "app"  do
 		filter ConcatFilter, "apptmp.js"
 	end
 
-	match "vendor/jquery.js" do
+	match "vendor/jquery-1.7.2.js" do
 		filter ConcatFilter, "apptmp.js"
 	end
 
-	match "vendor/handlebars-1.0.0.beta.6.js" do
+	match "vendor/handlebars-1.0.rc.2.js" do
 	#match "vendor/handlebars.runtime-1.0.0.beta.6.js" do
 		filter ConcatFilter, "apptmp.js"
 	end
