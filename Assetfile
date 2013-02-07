@@ -162,7 +162,6 @@ input "."  do
 
 end
 
-# TODO: ideally in the same file
 input "app"  do
 
 
@@ -237,7 +236,7 @@ input "app"  do
 		}
 
 	 concat "apptmp.js"
-    filter AddMicroLoader, :global => true
+   filter AddMicroLoader, :global => true
 	end
 
 
@@ -269,7 +268,6 @@ input "app"  do
 	end
 
 	match "vendor/handlebars-1.0.rc.2.js" do
-	#match "vendor/handlebars.runtime-1.0.0.beta.6.js" do
 		filter ConcatFilter, "apptmp.js"
 	end
 
