@@ -31,6 +31,101 @@ class AddMicroLoader < Rake::Pipeline::Filter
   end
 end
 
+class HandlebarsPrecompiler < Rake::Pipeline::Filter
+  class << self
+    def context
+
+      unless @context
+
+        contents = <<END
+
+#{File.read("./app/submodules/ember.js/packages/handlebars/lib/main.js")}
+#{File.read("./app/vendor/precompile/ember-runtime.js")}
+#{File.read("./app/submodules/ember.js/packages/ember-handlebars-compiler/lib/main.js")}
+function precompileEmberHandlebars(string) {
+  return Ember.Handlebars.precompile(string).toString();
+}
+END
+
+        @context = ExecJS.compile(contents)
+
+      end
+      @context
+    end
+
+  end
+
+  def precompile_templates(name, data)
+   "\nEmber.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{self.class.context.call("precompileEmberHandlebars", data)});\n"
+  end
+
+  def generate_output(inputs, output)
+
+    inputs.each do |input|
+
+      name = File.basename(input.path, '.handlebars')
+      data = File.read(input.fullpath)
+      result = precompile_templates(name, data)
+      output.write result
+
+    end
+  end
+end
+
+
+class InternalHandlebarsPrecompiler < Rake::Pipeline::Filter
+  class << self
+    def context
+
+      unless @context
+
+        contents = <<END
+
+#{File.read("./app/submodules/ember.js/packages/handlebars/lib/main.js")}
+#{File.read("./app/vendor/precompile/ember-runtime.js")}
+#{File.read("./app/submodules/ember.js/packages/ember-handlebars-compiler/lib/main.js")}
+function precompileEmberHandlebars(string) {
+  return Ember.Handlebars.precompile(string).toString();
+}
+END
+
+        @context = ExecJS.compile(contents)
+
+      end
+      @context
+    end
+
+  end
+
+  def precompile_templates(data)
+    # Precompile defaultTemplates
+   data.gsub!(%r{(defaultTemplate(?:\s*=|:)\s*)precompileTemplate\(['"](.*)['"]\)}) do
+     "#{$1}Ember.Handlebars.template(#{self.class.context.call("precompileEmberHandlebars", $2)})"
+   end
+  end
+
+  def generate_output(inputs, output)
+    inputs.each do |input|
+      result = File.read(input.fullpath)
+      precompile_templates(result)
+      output.write result
+    end
+  end
+end
+
+
+
+class CompileHandlebarsFilter < Rake::Pipeline::Filter
+
+  def generate_output(inputs, output)
+    inputs.each do |input|
+
+      name = File.basename(input.path, '.handlebars')
+      output.write "Ember.TEMPLATES['#{name}'] =  Ember.Handlebars.compile(#{input.read.to_json});\n"
+
+    end
+  end
+end
 
 
 class CustomLessFilter < Rake::Pipeline::Web::Filters::LessFilter
@@ -42,69 +137,6 @@ class CustomLessFilter < Rake::Pipeline::Web::Filters::LessFilter
                             './app/submodules/yoin-views/less/import2'] }
 	end
 
-end
-
-
-class PrecompiledHandlebarsFilter < Rake::Pipeline::Filter
-
-  def js_context
-    # We're using Ember to build Ember! Inception!
-    unless @context
-      headless = File.read("lib/headless-ember.js")
-      ember = File.read("lib/ember.js")
-      @context = ExecJS.compile([headless, ember].join("\n"))
-    end
-    @context
-  end
-
-  def initialize(&block)
-    block ||= proc { |input| input.sub(/\.handlebars$/, '.js') }
-    super(&block)
-		@counter = 0
-    @precompiled = true
-  end
-
-
-  def generate_output(inputs, output)
-
-		if ( @counter == 0 ) 
-
-			output.write "(function(){ 
-        ENV = {
-          VIEW_PRESERVES_CONTEXT:true,
-          CP_DEFAULT_CACHEABLE:true
-        };
-      })();\n"
-			output.write "minispade.require(\"rsvp\");\n"
-			output.write "minispade.require(\"container\");\n"
-			output.write "minispade.require(\"ember-debug\");\n"
-			output.write "minispade.require(\"ember-metal\");\n"
-			output.write "minispade.require(\"ember-runtime\");\n"
-			output.write "minispade.require(\"ember-application\");\n"
-			output.write "minispade.require(\"ember-views\");\n"
-			output.write "minispade.require(\"ember-states\");\n"
-			output.write "minispade.require(\"metamorph\");\n"
-			output.write "minispade.require(\"ember-handlebars\");\n"
-			output.write "minispade.require(\"ember-handlebars-compiler\");\n"
-		end
-		@counter += 1
-
-    inputs.each do |input|
-
-      name = File.basename(input.path, '.handlebars')
-      if ( @precompiled )
-        compiled = js_context.call("precompileEmberHandlebars", input.read)
-        output.write "\nEmber.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{compiled});\n"
-
-      else
-
-        output.write "Ember.TEMPLATES['#{name}'] =  Ember.Handlebars.compile(#{input.read.to_json});\n"
-
-      end
-
-
-    end
-  end
 end
 
 
@@ -166,7 +198,7 @@ input "app"  do
 
 
 	match "submodules/yoin-views-ipad/templates/**/*.handlebars" do
-		filter PrecompiledHandlebarsFilter
+		filter HandlebarsPrecompiler
 		filter ConcatFilter, "apptmp.js"
     filter AddMicroLoader, :global => true
 	end
@@ -174,12 +206,14 @@ input "app"  do
 
 
 	match "submodules/yoin-views/templates/**/*.handlebars" do
-		filter PrecompiledHandlebarsFilter
+		filter HandlebarsPrecompiler
 		filter ConcatFilter, "apptmp.js"
     filter AddMicroLoader, :global => true
 	end
 
-
+	match "vendor/precompile/ember-handlebars-require.js" do
+		filter ConcatFilter, "apptmp.js"
+  end
 
 	match "app/lib/**/*.js" do
 		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
@@ -236,6 +270,7 @@ input "app"  do
 		}
 
 	 concat "apptmp.js"
+   filter InternalHandlebarsPrecompiler
    filter AddMicroLoader, :global => true
 	end
 
@@ -267,7 +302,7 @@ input "app"  do
 		filter ConcatFilter, "apptmp.js"
 	end
 
-	match "vendor/handlebars-1.0.rc.2.js" do
+	match "vendor/handlebars.runtime-1.0.rc.2.js" do
 		filter ConcatFilter, "apptmp.js"
 	end
 
