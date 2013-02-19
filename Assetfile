@@ -6,190 +6,58 @@ require "execjs"
 require "uglifier"
 
 
-class AddMicroLoader < Rake::Pipeline::Filter
-  LOADER = File.expand_path("../app/submodules/ember.js/packages/loader/lib/main.js", __FILE__)
+require "./app/submodules/yoin-ember/rakep/filters"
+require "./app/submodules/yoin-views/rakep/filters"
+require "./app/submodules/yoin-views-ipad/rakep/filters"
 
-  def initialize(options={}, &block)
-    super(&block)
-    @global = options[:global]
-  end
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
 
-  def generate_output(inputs, output)
-    output.write "(function() {\n" unless @global
-
-    output.write File.read(LOADER)
-
-    inputs.each do |input|
-      output.write input.read
-    end
-
-    output.write "\n})();\n" unless @global
-  end
-
-  def additional_dependencies(input)
-    [ LOADER ]
+output "source/assets2"
+input "app/submodules/yoin-views-ipad/assets2"  do
+	match "**/*" do
+    copy
   end
 end
 
-class HandlebarsPrecompiler < Rake::Pipeline::Filter
-  class << self
-    def context
-
-      unless @context
-
-        contents = <<END
-
-#{File.read("./app/submodules/ember.js/packages/handlebars/lib/main.js")}
-#{File.read("./app/vendor/precompile/ember-runtime.js")}
-#{File.read("./app/submodules/ember.js/packages/ember-handlebars-compiler/lib/main.js")}
-function precompileEmberHandlebars(string) {
-  return Ember.Handlebars.precompile(string).toString();
-}
-END
-
-        @context = ExecJS.compile(contents)
-
-      end
-      @context
-    end
-
+output "source/assets"
+input "app/submodules/yoin-views/assets"  do
+	match "**/*" do
+    copy
   end
+end
 
-  def precompile_templates(name, data)
-   "\nEmber.TEMPLATES['#{name}'] = Ember.Handlebars.template(#{self.class.context.call("precompileEmberHandlebars", data)});\n"
-  end
-
-  def generate_output(inputs, output)
-
-    inputs.each do |input|
-
-      name = File.basename(input.path, '.handlebars')
-      data = File.read(input.fullpath)
-      result = precompile_templates(name, data)
-      output.write result
-
-    end
+output "source/assets_fx"
+input "app/submodules/yoin-views/assets_fx"  do
+	match "**/*" do
+    copy
   end
 end
 
 
-class InternalHandlebarsPrecompiler < Rake::Pipeline::Filter
-  class << self
-    def context
-
-      unless @context
-
-        contents = <<END
-
-#{File.read("./app/submodules/ember.js/packages/handlebars/lib/main.js")}
-#{File.read("./app/vendor/precompile/ember-runtime.js")}
-#{File.read("./app/submodules/ember.js/packages/ember-handlebars-compiler/lib/main.js")}
-function precompileEmberHandlebars(string) {
-  return Ember.Handlebars.precompile(string).toString();
-}
-END
-
-        @context = ExecJS.compile(contents)
-
-      end
-      @context
-    end
-
-  end
-
-  def precompile_templates(data)
-    # Precompile defaultTemplates
-   data.gsub!(%r{(defaultTemplate(?:\s*=|:)\s*)precompileTemplate\(['"](.*)['"]\)}) do
-     "#{$1}Ember.Handlebars.template(#{self.class.context.call("precompileEmberHandlebars", $2)})"
-   end
-  end
-
-  def generate_output(inputs, output)
-    inputs.each do |input|
-      result = File.read(input.fullpath)
-      precompile_templates(result)
-      output.write result
-    end
-  end
-end
-
-
-
-class CompileHandlebarsFilter < Rake::Pipeline::Filter
-
-  def generate_output(inputs, output)
-    inputs.each do |input|
-
-      name = File.basename(input.path, '.handlebars')
-      output.write "Ember.TEMPLATES['#{name}'] =  Ember.Handlebars.compile(#{input.read.to_json});\n"
-
-    end
-  end
-end
-
-
-class CustomLessFilter < Rake::Pipeline::Web::Filters::LessFilter
-
-	def initialize(options={}, context = nil, &block)
-		super(options, context, &block)
-		@options = { :paths => ['./app/submodules/yoin-views-ipad/less/import', 
-                            './app/submodules/yoin-views/less/import', 
-                            './app/submodules/yoin-views/less/import2'] }
-	end
-
-end
-
-
-class EmberProductionFilter < Rake::Pipeline::Filter
-  def generate_output(inputs, output)
-    inputs.each do |input|
-      result = File.read(input.fullpath)
-      result.gsub!(%r{^(\s)+ember_(assert|deprecate|warn)\((.*)\).*$}, "")
-      output.write result
-    end
-  end
-end
-
-# you must restart the server?
-files = Dir.glob('app/submodules/yoin-views/assets/*')
-FileUtils.mkdir 'source/assets' unless Dir.exists? 'source/assets'
-FileUtils.cp_r files, 'source/assets'
-
-files = Dir.glob('app/submodules/yoin-views/assets_fx/*')
-FileUtils.mkdir 'source/assets_fx' unless Dir.exists? 'source/assets_fx'
-FileUtils.cp_r files, 'source/assets_fx'
-
-files2 = Dir.glob('app/submodules/yoin-views-ipad/assets2/*')
-FileUtils.mkdir 'source/assets2' unless Dir.exists? 'source/assets2'
-FileUtils.cp_r files2, 'source/assets2'
-puts 'moved images to the correct folder'
-
-
-output "source"
-
-
+output "tmp/source"
 input "."  do
 
 
 	match "app/submodules/yoin-views-ipad/less/views/**/*.less" do
-		filter CustomLessFilter 
-		filter ConcatFilter, "projecttmp.css"
+		filter Yoin::LessFilter 
+		concat "projecttmp.css"
 	end
 
 	match "app/submodules/yoin-views/less/views/**/*.less" do
-		filter CustomLessFilter 
-		filter ConcatFilter, "projecttmp.css"
+		filter Yoin::LessFilter 
+		concat "projecttmp.css"
 	end
 
   media_query = "tablet"
 
 	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
-		filter CustomLessFilter 
-		filter ConcatFilter, "projecttmp.css"
+		filter Yoin::LessFilter 
+		concat "projecttmp.css"
 	end
 
 	match "app/submodules/yoin-views/reset/normalize.css" do
-		filter ConcatFilter, "projecttmp.css"
+		concat "projecttmp.css"
 	end
 
 end
@@ -198,21 +66,21 @@ input "app"  do
 
 
 	match "submodules/yoin-views-ipad/templates/**/*.handlebars" do
-		filter HandlebarsPrecompiler
-		filter ConcatFilter, "apptmp.js"
-    filter AddMicroLoader, :global => true
+		filter Yoin::HandlebarsPrecompiler
+		concat "apptmp.js"
+    filter Yoin::AddMicroLoader, :global => true
 	end
 
 
 
 	match "submodules/yoin-views/templates/**/*.handlebars" do
-		filter HandlebarsPrecompiler
-		filter ConcatFilter, "apptmp.js"
-    filter AddMicroLoader, :global => true
+		filter Yoin::HandlebarsPrecompiler
+		concat "apptmp.js"
+    filter Yoin::AddMicroLoader, :global => true
 	end
 
-	match "vendor/precompile/ember-handlebars-require.js" do
-		filter ConcatFilter, "apptmp.js"
+	match "submodules/yoin-ember/vendor/precompile/ember-handlebars-require.js" do
+		concat "apptmp.js"
   end
 
 	match "app/lib/**/*.js" do
@@ -225,7 +93,7 @@ input "app"  do
 		}
 
 		concat "apptmp.js"
-    filter AddMicroLoader, :global => true
+    filter Yoin::AddMicroLoader, :global => true
 	end
 
 
@@ -238,7 +106,7 @@ input "app"  do
 		}
 
 	 concat "apptmp.js"
-   filter AddMicroLoader, :global => true
+   filter Yoin::AddMicroLoader, :global => true
 	end
 
 
@@ -252,8 +120,8 @@ input "app"  do
 			id
 		}
 
-	 concat "apptmp.js"
-    filter AddMicroLoader, :global => true
+	  concat "apptmp.js"
+    filter Yoin::AddMicroLoader, :global => true
 	end
 
 
@@ -270,72 +138,40 @@ input "app"  do
 		}
 
 	 concat "apptmp.js"
-   filter InternalHandlebarsPrecompiler
-   filter AddMicroLoader, :global => true
+   filter Yoin::FixEmberViews
+   filter Yoin::AddMicroLoader, :global => true
 	end
 
-
-
-
-
-	match "vendor/minispade.js" do
-		filter ConcatFilter, "apptmp.js"
+	match "submodules/yoin-views/vendor/*.js" do
+		concat "apptmp.js"
 	end
 
-	match "vendor/qrcode.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
-	match "vendor/moment.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
-	match "vendor/infobubble.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
-	match "vendor/jquery.ui.map.min.js.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
-	match "vendor/jquery-1.7.2.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
-	match "vendor/handlebars.runtime-1.0.rc.2.js" do
-		filter ConcatFilter, "apptmp.js"
-	end
-
-	#match "vendor/facebook_js_sdk.js" do
-	#	filter ConcatFilter, "apptmp.js"
-	#end
-
-	match "vendor/i18n.js" do
-		filter ConcatFilter, "apptmp.js"
+	match "submodules/yoin-ember/vendor/*.js" do
+		concat "apptmp.js"
 	end
 
 end
 
-## check YOIN_PROD to minify output to production development
-input "source"  do
+
+production = !ENV['YOIN_PROD'].nil? && !ENV['YOIN_PROD'].empty?
+
+output "source"
+input "tmp/source"  do
 
 	match "apptmp.js" do
 
-    if ( !ENV['YOIN_PROD'].nil? && !ENV['YOIN_PROD'].empty? )
-      filter EmberProductionFilter
+    if production
+      filter Yoin::EmberProductionFilter
       uglify( {:copyright => false} )
     end
 
-		filter ConcatFilter, "app.js"
+		concat "app.js"
 
 	end
 
 	match "projecttmp.css" do
 
-    if ( !ENV['YOIN_PROD'].nil? && !ENV['YOIN_PROD'].empty? )
-      yui_css 
-    end
-		filter ConcatFilter, "project.css"
+		concat "project.css"
 
 	end
 
