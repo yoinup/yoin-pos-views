@@ -44,17 +44,18 @@ input "."  do
 		concat "projecttmp.css"
 	end
 
-	match "app/submodules/yoin-views/less/views/**/*.less" do
-		filter Yoin::LessFilter 
-		concat "projecttmp.css"
-	end
-
   media_query = "tablet"
 
 	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
 		filter Yoin::LessFilter 
 		concat "projecttmp.css"
 	end
+
+	match "app/submodules/yoin-views/less/views/**/*.less" do
+		filter Yoin::LessFilter 
+		concat "projecttmp.css"
+	end
+
 
 	match "app/submodules/yoin-views/reset/normalize.css" do
 		concat "projecttmp.css"
