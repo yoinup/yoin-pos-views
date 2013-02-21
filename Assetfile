@@ -13,6 +13,9 @@ require "./app/submodules/yoin-views-ipad/rakep/filters"
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
+
+is_android = true
+
 output "source/assets2"
 input "app/submodules/yoin-views-ipad/assets2"  do
 	match "**/*" do
@@ -35,6 +38,7 @@ input "app/submodules/yoin-views/assets_fx"  do
 end
 
 
+
 output "tmp/source"
 input "."  do
 
@@ -44,7 +48,15 @@ input "."  do
 		concat "projecttmp.css"
 	end
 
+  if is_android 
+    match "app/submodules/yoin-views/less/query/android/**/*.less" do
+      filter Yoin::LessFilter 
+      concat "projecttmp.css"
+    end
+  end
+
   media_query = "tablet"
+
 
 	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
 		filter Yoin::LessFilter 
