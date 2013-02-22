@@ -13,3 +13,6 @@
 [submodule "app/submodules/ember-touch"]
 	path = app/submodules/ember-touch
 	url = git@github.com:yoinup/ember-touch.git
+[submodule "app/submodules/yoin-views-pos"]
+	path = app/submodules/yoin-views-pos
+	url = git@github.com:ppcano/yoin-views-pos.git
