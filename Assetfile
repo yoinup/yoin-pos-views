@@ -8,16 +8,16 @@ require "uglifier"
 
 require "./app/submodules/yoin-ember/rakep/filters"
 require "./app/submodules/yoin-views/rakep/filters"
-require "./app/submodules/yoin-views-ipad/rakep/filters"
+require "./app/submodules/yoin-views-pos/rakep/filters"
 
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
 
-is_android = true
+is_android = !ENV['ANDROID'].nil? && !ENV['ANDROID'].empty?
 
 output "source/assets2"
-input "app/submodules/yoin-views-ipad/assets2"  do
+input "app/submodules/yoin-views-pos/assets2"  do
 	match "**/*" do
     copy
   end
@@ -43,7 +43,7 @@ output "tmp/source"
 input "."  do
 
 
-	match "app/submodules/yoin-views-ipad/less/views/**/*.less" do
+	match "app/submodules/yoin-views-pos/less/views/**/*.less" do
 		filter Yoin::LessFilter 
 		concat "projecttmp.css"
 	end
@@ -78,7 +78,7 @@ end
 input "app"  do
 
 
-	match "submodules/yoin-views-ipad/templates/**/*.handlebars" do
+	match "submodules/yoin-views-pos/templates/**/*.handlebars" do
 		filter Yoin::HandlebarsPrecompiler
 		concat "apptmp.js"
 	end
@@ -117,7 +117,7 @@ input "app"  do
 	end
 
 
-	match "submodules/{yoin-ember,yoin-views,yoin-views-ipad}/lib/**/*.js" do
+	match "submodules/{yoin-ember,yoin-views,yoin-views-pos}/lib/**/*.js" do
 		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
 			id = input.path.dup
 			id.sub!('submodules/', '')

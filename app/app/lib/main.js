@@ -16,7 +16,7 @@ require('yoin-ember/models');
 require('yoin-ember/fixtures/initial');
 
 require('yoin-views');
-require('yoin-views-ipad');
+require('yoin-views-pos');
 
 
 
