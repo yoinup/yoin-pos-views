@@ -1,6 +1,3 @@
-[submodule "app/submodules/yoin-views-ipad"]
-	path = app/submodules/yoin-views-ipad
-	url = git@github.com:ppcano/yoin-views-ipad.git
 [submodule "app/submodules/yoin-views"]
 	path = app/submodules/yoin-views
 	url = git@github.com:ppcano/yoin-views.git
