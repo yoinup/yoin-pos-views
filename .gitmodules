@@ -10,3 +10,9 @@
 [submodule "app/submodules/yoin-views-pos"]
 	path = app/submodules/yoin-views-pos
 	url = git@github.com:ppcano/yoin-views-pos.git
+[submodule "app/submodules/data"]
+	path = app/submodules/data
+	url = git@github.com:yoinup/data.git
+[submodule "app/submodules/ember.js"]
+	path = app/submodules/ember.js
+	url = git@github.com:yoinup/ember.js.git
