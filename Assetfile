@@ -44,13 +44,13 @@ input "."  do
 
 
 	match "app/submodules/yoin-views-pos/less/views/**/*.less" do
-		filter Yoin::LessFilter 
+		filter Yoin::LessFilter, :is_android => is_android
 		concat "projecttmp.css"
 	end
 
   if is_android 
     match "app/submodules/yoin-views/less/query/android/**/*.less" do
-      filter Yoin::LessFilter 
+      filter Yoin::LessFilter, :is_android => is_android
       concat "projecttmp.css"
     end
   end
@@ -59,12 +59,12 @@ input "."  do
 
 
 	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
-		filter Yoin::LessFilter 
+    filter Yoin::LessFilter, :is_android => is_android
 		concat "projecttmp.css"
 	end
 
 	match "app/submodules/yoin-views/less/views/**/*.less" do
-		filter Yoin::LessFilter 
+    filter Yoin::LessFilter, :is_android => is_android
 		concat "projecttmp.css"
 	end
 
@@ -104,6 +104,18 @@ input "app"  do
 		concat "apptmp.js"
 	end
 
+  if is_android
+    match "submodules/yoin-views/lib-android/**/*.js" do
+      minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|
+        id = input.path.dup
+        id.sub!('submodules/', '')
+        id.sub!(/\.js$/, '')
+        id.sub!(/\/main$/, '')
+        id
+      }
+     concat "apptmp.js"
+    end
+	end
 
 	match "submodules/{yoin-ember}/fixtures/**/*.js" do
 		minispade :rewrite_requires => true, :string=> false, :module_id_generator => proc { |input|

@@ -16,6 +16,14 @@ require('yoin-ember/models');
 require('yoin-ember/fixtures/initial');
 
 require('yoin-views');
+
+try {
+  require('yoin-views/lib-android');
+} catch(e) {
+  // lib-android is not loaded in iOS env
+  // TODO: find a more elegant way to do that
+}
+
 require('yoin-views-pos');
 
 
