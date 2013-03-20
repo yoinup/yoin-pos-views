@@ -12,6 +12,7 @@ App = Me.Application.create({
       self.view = Yvi.LoginScreenView.create({
         venueUser: venueUser,
 				showCameraDeviceButton: true,
+				hasConnection: false,
 				isDeviceFront: false
       });
 
