@@ -5,14 +5,12 @@ require "less"
 require "execjs"
 require "uglifier"
 
-
 require "./app/submodules/yoin-ember/rakep/filters"
 require "./app/submodules/yoin-views/rakep/filters"
 require "./app/submodules/yoin-views-pos/rakep/filters"
 
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
-
 
 is_android = !ENV['ANDROID'].nil? && !ENV['ANDROID'].empty?
 
@@ -42,7 +40,6 @@ end
 output "tmp/source"
 input "."  do
 
-
 	match "app/submodules/yoin-views-pos/less/views/**/*.less" do
 		filter Yoin::LessFilter, :is_android => is_android
 		concat "projecttmp.css"
@@ -55,10 +52,12 @@ input "."  do
     end
   end
 
-  media_query = "tablet"
+	match "app/submodules/yoin-views/less/query/tablet/**/*.less" do
+    filter Yoin::LessFilter, :is_android => is_android
+		concat "projecttmp.css"
+	end
 
-
-	match "app/submodules/yoin-views/less/query/#{media_query}/**/*.less" do
+	match "app/submodules/yoin-views/less/query/mobile/**/*.less" do
     filter Yoin::LessFilter, :is_android => is_android
 		concat "projecttmp.css"
 	end
