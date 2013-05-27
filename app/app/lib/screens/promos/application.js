@@ -6,10 +6,15 @@ App = Me.Application.create({
 		this.loadData();
 		var self = this;
 
-		self.view = Yvi.PromosScreenView.create({
-		});
+    var products = this.store.findMany(Yn.Product, [41, 23, 37, 30, 42, 6]);
+    products.addObserver('isLoaded', function() {
+      self.view = Yvi.PromosScreenView.create({
+        runningProducts: products,
+        stoppedProducts: products
+      });
+      self.view.appendTo('#app');
+    });
 
-		self.view.appendTo('#app');
 
 	}
 
