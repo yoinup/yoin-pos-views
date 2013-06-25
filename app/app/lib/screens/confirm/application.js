@@ -5,25 +5,36 @@ App = Me.Application.create({
 
 		this.loadData();
 		var self = this,
-				user = this.store.find(Yn.User, 16),
-				venue = this.store.find(Yn.Venue, 236),
-				//invitations = this.store.findMany(Yn.Invitation, [1,2]),
-				invitations = this.store.findMany(Yn.Invitation, [1,2,3]),
+				user, 
+				venue,
+        invitations,
 				selectedInvitation;
 
-		invitations.addObserver('isLoaded', function() {
+    user = this.store.find(Yn.User, 16);
+		user.addObserver('isLoaded', function() {
 
-			selectedInvitation = invitations.get('firstObject');
+      venue = this.store.find(Yn.Venue, 236),
+      venue.addObserver('isLoaded', function() {
 
-			self.view = Yvi.ConfirmScreenView.create({
-				user: user,
-				venue: venue,
-				invitations: invitations,
-				selected: selectedInvitation
-			});
+        invitations = this.store.findMany(Yn.Invitation, [1]);
+        invitations = this.store.findMany(Yn.Invitation, [1,2]);
+        //invitations = this.store.findMany(Yn.Invitation, [1,2,3]);
+        invitations.addObserver('isLoaded', function() {
 
-			self.view.appendTo('#app');
+          selectedInvitation = invitations.get('firstObject');
+          selectedInvitation.set('consumed', true);
 
+          self.view = Yvi.ConfirmScreenView.create({
+            user: user,
+            venue: venue,
+            selected: selectedInvitation
+          });
+
+          self.view.appendTo('#app');
+
+        });
+
+      });
 		});
 
 	}
