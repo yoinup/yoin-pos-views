@@ -1,6 +1,6 @@
 
 
-less:
+server:
 
 	rm -rf tmp/* source/*
 	bundle exec rackup -p 9595
@@ -15,4 +15,4 @@ pull:
 
 
 
-.PHONY: log less pull
+.PHONY: log server pull
