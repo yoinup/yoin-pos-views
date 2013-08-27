@@ -16,7 +16,7 @@ App = Me.Application.create({
       venue = this.store.find(Yn.Venue, 236),
       venue.addObserver('isLoaded', function() {
 
-        invitations = this.store.findMany(Yn.Invitation, [1]);
+        //invitations = this.store.findMany(Yn.Invitation, [1]);
         invitations = this.store.findMany(Yn.Invitation, [1,2]);
         //invitations = this.store.findMany(Yn.Invitation, [1,2,3]);
         invitations.addObserver('isLoaded', function() {
@@ -27,6 +27,7 @@ App = Me.Application.create({
           self.view = Yvi.ConfirmScreenView.create({
             user: user,
             venue: venue,
+            isConsumed: true,
             selected: selectedInvitation
           });
 
