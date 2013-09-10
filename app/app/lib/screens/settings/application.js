@@ -17,7 +17,8 @@ App = Me.Application.create({
 				brand: brand,
 				cities: cities,
 				showCameraDeviceButton: true,
-				isDeviceFront: true
+				isDeviceFront: true,
+				isSandbox: true
 			});
 
 			self.view.appendTo('#app');

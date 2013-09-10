@@ -22,7 +22,8 @@ App = Me.Application.create({
         invitations.addObserver('isLoaded', function() {
 
           selectedInvitation = invitations.get('firstObject');
-          selectedInvitation.set('consumed', true);
+          selectedInvitation.set('consumed', false);
+          selectedInvitation.set('expired', true);
 
           self.view = Yvi.ConfirmScreenView.create({
             user: user,
