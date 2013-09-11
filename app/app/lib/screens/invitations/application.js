@@ -10,7 +10,10 @@ App = Me.Application.create({
 		invitations.one('didLoad', function(item) {
 
       self.view = Yvi.InvitationsScreenView.create({
-        invitations: invitations
+        pendingInvitations: invitations,
+        consumedInvitations: invitations,
+
+				option: Yvi.InvitationsOption.consumed
       });
 
       self.view.appendTo('#app');
