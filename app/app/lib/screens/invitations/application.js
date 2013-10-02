@@ -13,7 +13,7 @@ App = Me.Application.create({
         pendingInvitations: invitations,
         consumedInvitations: invitations,
 
-				option: Yvi.InvitationsOption.consumed
+				option: Yvi.InvitationsOption.pending
       });
 
       self.view.appendTo('#app');
