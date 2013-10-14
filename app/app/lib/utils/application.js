@@ -90,6 +90,7 @@ Me.Application = Yn.Application.extend({
     App.store.findQuery(Yn.City, {});
     App.store.findQuery(Yn.FbChannel, {});
     App.store.findQuery(Yn.PhoneChannel, {});
+    App.store.findQuery(Yn.ProductUnit, {});
 
     App.store.findQuery(Yn.User, {});
     App.store.findQuery(Yn.Like, {});
