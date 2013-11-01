@@ -18,6 +18,7 @@ App = Me.Application.create({
 				cities: cities,
 				showCameraDeviceButton: true,
 				isDeviceFront: true,
+        hasPendingAction: true,
 				isSandbox: true
 			});
 
